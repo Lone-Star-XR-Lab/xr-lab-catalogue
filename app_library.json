@@ -1432,26 +1432,134 @@
   "content_notes": "Ocean environments; includes conservation messaging.",
   "approved": false,
   "installed": false
+},
+{
+  "title": "In the Shoes of an Autistic Person",
+  "department": ["Counseling", "Education", "Social Sciences"],
+  "platform": "Meta Quest",
+  "tags": ["Autism", "Empathy", "Disability Studies", "Education"],
+  "description": "An immersive VR experience that simulates the world from the perspective of an autistic person, helping users understand sensory differences and challenges.",
+  "educational": "Useful for counseling, education, and social science programs—supports empathy training, inclusion awareness, and classroom discussions about neurodiversity.",
+  "notes": "Free on Quest; short experience designed for awareness and empathy-building.",
+  "link": "https://www.meta.com/experiences/in-the-shoes-of-an-autistic-person/5897385903663059/",
+  "logo": "images/apps/in-the-shoes-of-an-autistic-person.jpg",
+  "cost": "Free",
+  "time_min": 15,
+  "comfort": "Comfortable",
+  "motion_level": "Low",
+  "input": "Controllers",
+  "devices": ["Quest 3", "Quest 2", "Quest Pro"],
+  "age": "13+",
+  "content_notes": "Simulated sensory overload; may be uncomfortable for sensitive users.",
+  "approved": false,
+  "installed": false
+},
+{
+  "title": "Autismity",
+  "department": ["Counseling", "Education", "Social Sciences"],
+  "platform": "Meta Quest",
+  "tags": ["Autism", "Empathy", "Disability Studies", "Education"],
+  "description": "A VR simulation that places users in the shoes of an autistic person, recreating sensory overload and communication challenges to build empathy and awareness.",
+  "educational": "Valuable for teacher training, counseling, and social science programs—helps students and educators better understand neurodiversity.",
+  "notes": "Paid title; intended as an awareness and empathy-building tool, not a diagnostic resource.",
+  "link": "https://www.meta.com/experiences/autismity/ (App Lab/Quest Store link)",
+  "logo": "images/apps/autismity.png",
+  "cost": "Paid (~$9.99)",
+  "time_min": 15,
+  "comfort": "Comfortable",
+  "motion_level": "Low",
+  "input": "Controllers",
+  "devices": ["Quest 3", "Quest 2", "Quest Pro"],
+  "age": "13+",
+  "content_notes": "Simulated sensory overload; may be uncomfortable for sensitive users.",
+  "approved": false,
+  "installed": false
+},
+
+{
+  "title": "CSIxR",
+  "department": ["Criminal Justice", "Forensic Science", "STEM"],
+  "platform": "Meta Quest (Institutional Access)",
+  "tags": ["Forensics", "Criminal Justice", "STEM", "Education"],
+  "description": "An immersive VR training tool for crime scene investigation. Students can explore realistic forensic environments, identify evidence, and practice CSI procedures in a safe virtual space.",
+  "educational": "Designed for criminal justice and forensic science programs—teaches investigative methods, evidence handling, and critical thinking through experiential learning.",
+  "notes": "Not publicly available on the Quest Store. Institutional access may require contacting the university or developer directly.",
+  "link": "https://csixr.example.edu (institutional access info may vary)",
+  "logo": "images/apps/csixr.jpg",
+  "cost": "Institutional license (contact developer)",
+  "time_min": null,
+  "comfort": "Moderate",
+  "motion_level": "Medium",
+  "input": "Controllers",
+  "devices": ["Quest 3", "Quest 2", "Quest Pro"],
+  "age": "16+",
+  "content_notes": "Crime scene simulation may include sensitive material.",
+  "approved": false,
+  "installed": false
+},
+{
+  "title": "VictoryXR",
+  "department": ["STEM", "Health Science", "History", "Languages", "All Departments"],
+  "platform": "Meta Quest (Institutional Access)",
+  "tags": ["Education", "Virtual Campus", "Science", "History", "Labs", "Field Trips"],
+  "description": "A comprehensive VR education platform providing a wide range of immersive modules including virtual dissection labs, science demonstrations, history field trips, and full VictoryXR Campus experiences.",
+  "educational": "Covers multiple subjects across STEM, humanities, and career education. Enables virtual classrooms, lab simulations, and collaborative campus environments designed for schools and universities.",
+  "notes": "Institutional license required; not a standalone public app. VictoryXR partners with schools to deploy customized VR curricula.",
+  "link": "https://www.victoryxr.com/",
+  "logo": "images/apps/victoryxr.jpg",
+  "cost": "Institutional license / subscription (contact VictoryXR for pricing)",
+  "time_min": null,
+  "comfort": "Comfortable",
+  "motion_level": "Low",
+  "input": "Both",
+  "devices": ["Quest 3", "Quest 2", "Quest Pro"],
+  "age": "13+",
+  "content_notes": "Content varies by subject—includes science dissections, history reenactments, and more.",
+  "approved": false,
+  "installed": false
+},
+{
+  "title": "Acadicus",
+  "department": ["Health Science", "Nursing", "Emergency Training"],
+  "platform": "Meta Quest (Institutional Access)",
+  "tags": ["Medical Training", "Simulation", "Healthcare", "Education"],
+  "description": "A VR training platform for healthcare education featuring immersive clinical scenarios, patient simulations, and interactive learning environments.",
+  "educational": "Used by nursing and medical programs to practice clinical decision-making, patient care, and emergency procedures. Instructors can create and customize scenarios for learners.",
+  "notes": "Institutional license required; not available as a public Quest Store app. Requires managed distribution via Acadicus partnership.",
+  "link": "https://acadicus.com/",
+  "logo": "images/apps/acadicus.png",
+  "cost": "Institutional license (contact Acadicus for pricing)",
+  "time_min": null,
+  "comfort": "Comfortable",
+  "motion_level": "Low",
+  "input": "Both",
+  "devices": ["Quest 3", "Quest 2", "Quest Pro"],
+  "age": "16+",
+  "content_notes": "Medical training scenarios may include realistic clinical content.",
+  "approved": false,
+  "installed": false
+},
+{
+  "title": "TRANSFR VR",
+  "department": ["Career & Technical Education", "STEM", "Workforce Development"],
+  "platform": "Meta Quest (Institutional Access)",
+  "tags": ["Trades", "CTE", "Workforce Training", "Simulation", "Career Skills"],
+  "description": "A VR training platform focused on career and technical education, offering hands-on simulations for trades, safety, and job skills. Used in schools, workforce programs, and community colleges.",
+  "educational": "Provides immersive training scenarios for industries such as manufacturing, automotive, construction, and hospitality. Helps students and job seekers gain practical experience and career readiness.",
+  "notes": "Institutional license required; distributed directly to schools and training centers, not available on the public Quest Store.",
+  "link": "https://transfrinc.com/",
+  "logo": "images/apps/transfr-vr.svg",
+  "cost": "Institutional license (subscription, contact Transfr for pricing)",
+  "time_min": null,
+  "comfort": "Comfortable",
+  "motion_level": "Low",
+  "input": "Controllers",
+  "devices": ["Quest 3", "Quest 2", "Quest Pro"],
+  "age": "16+",
+  "content_notes": "Job training scenarios; some modules may include simulated workplace hazards.",
+  "approved": false,
+  "installed": false
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
