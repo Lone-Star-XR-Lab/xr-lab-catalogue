@@ -5,428 +5,454 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Lone Star XR Lab App Catalogue</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Shared UI code/styles, single-sourced from xr-app-data so this site
+       and xr-lab-library stay in sync. Do not fork a local copy. -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Lone-Star-XR-Lab/xr-app-data@main/ui/styles.css">
+  <script defer src="https://cdn.jsdelivr.net/gh/Lone-Star-XR-Lab/xr-app-data@main/ui/app.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-  <style>
-    @media print {
-      body { background: #fff !important; color: #000 !important; }
-      .no-print { display: none !important; }
-      .grid { display: block !important; }
-      .grid > * { break-inside: avoid; margin-bottom: 1rem; }
-      .shadow-sm, .shadow, .shadow-lg { box-shadow: none !important; }
-    }
-  </style>
 </head>
-<body class="bg-gray-50 text-gray-900" x-data="app()" x-init="loadData()">
+<body class="bg-gray-50 text-gray-900" x-data="app({ site: 'catalogue' })" x-init="loadData()">
   <div class="max-w-7xl mx-auto px-4 py-6">
-    <!-- Header -->
-    <div class="flex items-start justify-between gap-3">
-      <h1 class="text-3xl font-bold">Lone Star XR Lab App Catalogue </h1>
-      <p class="text-xs text-gray-500 no-print">
+    <div class="flex items-start justify-between gap-6">
+      <div class="min-w-0">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-5">
+          <img
+            src="https://cdn.jsdelivr.net/gh/Lone-Star-XR-Lab/xr-app-data@main/images/logo/XR%20Lab%20Logo_Black.png"
+            alt="Lone Star XR Lab"
+            class="h-24 w-auto sm:h-28"
+            width="448"
+            height="112"
+          >
+          <h1 class="text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
+            App Catalogue
+          </h1>
+        </div>
+        <p class="mt-2 max-w-3xl text-base leading-7 text-slate-600">
+          This catalogue shows XR apps and experiences that exist in the wider ecosystem, whether or not the lab currently owns or has installed them. Use it to browse potential purchases, apps under evaluation, and faculty requests alongside what's already in the library.
+        </p>
+      </div>
+      <p class="pt-1 text-xs text-gray-500">
         <span class="underline decoration-dotted cursor-help" title="XR is an umbrella term for VR, AR, and MR.">What is XR?</span>
       </p>
     </div>
 
-    <!-- Fixed banner (cannot be closed) directly under header -->
-    <div class="no-print my-4">
-      <div class="rounded-lg border border-amber-300 bg-amber-50 text-amber-900 px-4 py-3 flex items-start gap-3">
-        <span class="text-xl leading-none">🚧</span>
-        <div class="flex-1">
-          <p class="font-semibold">Work in progress</p>
-          <p class="text-sm">
-            This app library is actively being updated. Some items may be missing details or out of date.
-          </p>
-        </div>
+    <div class="mt-4 rounded-lg border border-amber-300 bg-amber-50 text-amber-900 px-4 py-3 flex items-start gap-3">
+      <span class="text-xl leading-none">🚧</span>
+      <div class="flex-1">
+        <p class="font-semibold">Work in progress</p>
+        <p class="text-sm">This catalogue is actively being updated. Some items may be missing details or out of date.</p>
       </div>
     </div>
 
-    <p class="text-sm text-gray-700 mt-2 mb-6">
-      <strong>Note:</strong> This list includes apps and XR content that <em>may not currently be installed</em> in the XR Lab. These are curated examples of experiences available for Meta Quest that may be valuable in educational settings.
-    </p>
-
-    <!-- Tabs -->
-    <div class="flex flex-wrap gap-2 mb-4" x-show="sheetNames.length">
-      <template x-for="tab in sheetNames" :key="tab">
-        <button
-          @click="switchTab(tab)"
-          :class="tab === currentTab ? 'bg-blue-600 text-white' : 'bg-white text-gray-800 border'"
-          class="px-4 py-2 rounded-lg text-sm shadow-sm transition"
-          x-text="tab"></button>
-      </template>
-      <div class="ml-auto flex items-center gap-3 no-print">
-        <span class="text-xs text-gray-500" x-text="filteredApps.length + ' results'"></span>
-        <button class="text-xs underline" @click="togglePrintMode()"
-                x-text="printMode ? 'Exit print view' : 'Print-friendly view'"></button>
-      </div>
-    </div>
-
-    <!-- Controls bar: Department dropdown + Search + Sort + Saved -->
-    <div class="grid grid-cols-1 md:grid-cols-5 gap-3 mb-3 no-print" x-show="apps.length">
-      <!-- Department dropdown (with counts) -->
-      <div class="md:col-span-2">
-        <label class="block text-xs text-gray-600 mb-1">Department</label>
-        <select x-model="department" class="w-full border px-3 py-2 rounded-md shadow-sm">
-          <option value="">All Departments</option>
-          <template x-for="opt in departmentOptions" :key="opt">
-            <option :value="opt" x-text="deptOptionLabel(opt)"></option>
-          </template>
-        </select>
+    <div class="mt-6">
+      <div class="flex items-center gap-2 border-b border-gray-200 pb-1 mb-4">
+        <button type="button"
+                class="px-3 py-2 text-sm font-semibold transition-colors border-b-2"
+                :class="activeTab==='apps' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500'"
+                aria-controls="tab-apps"
+                :aria-selected="activeTab==='apps'"
+                @click="activeTab='apps'">
+          App Catalogue
+        </button>
+        <button type="button"
+                class="px-3 py-2 text-sm font-semibold transition-colors border-b-2"
+                :class="activeTab==='videos' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500'"
+                aria-controls="tab-videos"
+                :aria-selected="activeTab==='videos'"
+                @click="activeTab='videos'">
+          Video Content
+        </button>
+        <button type="button"
+                class="px-3 py-2 text-sm font-semibold transition-colors border-b-2"
+                :class="activeTab==='webxr' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500'"
+                aria-controls="tab-webxr"
+                :aria-selected="activeTab==='webxr'"
+                @click="activeTab='webxr'">
+          WebXR Content
+        </button>
       </div>
 
-      <!-- Search -->
-      <div class="md:col-span-2">
-        <label class="block text-xs text-gray-600 mb-1">Search</label>
-        <input type="text" x-model="query" placeholder="Title, notes, tags…"
-               class="w-full border px-3 py-2 rounded-md shadow-sm">
-      </div>
-
-      <!-- Sort + Saved -->
-      <div class="md:col-span-1">
-        <label class="block text-xs text-gray-600 mb-1">Sort</label>
-        <div class="flex items-center gap-2">
-          <select x-model="sortMode" class="border px-3 py-2 rounded-md shadow-sm w-full">
-            <option value="az">Title A–Z</option>
-            <option value="za">Title Z–A</option>
-          </select>
-        </div>
-        <label class="mt-2 flex items-center gap-2 text-sm">
-          <input type="checkbox" x-model="savedOnly" />
-          <span>Saved only</span>
-        </label>
-      </div>
-    </div>
-
-    <!-- Quick Filters (compact) -->
-    <div class="flex flex-wrap items-center gap-2 mb-5 no-print" x-show="apps.length">
-      <span class="text-sm font-semibold text-gray-700">Quick filters:</span>
-      <button @click="togglePill('free')"        :class="pillClass('free')"        class="px-3 py-1.5 rounded-full text-sm border">Free</button>
-      <button @click="togglePill('short')"       :class="pillClass('short')"       class="px-3 py-1.5 rounded-full text-sm border">≤ 15 min</button>
-      <button @click="togglePill('hands')"       :class="pillClass('hands')"       class="px-3 py-1.5 rounded-full text-sm border">Hands</button>
-      <button @click="togglePill('lowmotion')"   :class="pillClass('lowmotion')"   class="px-3 py-1.5 rounded-full text-sm border">Low motion</button>
-      <button @click="togglePill('quest3')"      :class="pillClass('quest3')"      class="px-3 py-1.5 rounded-full text-sm border">Quest 3</button>
-      <button @click="clearAll()" class="ml-2 text-xs underline">Clear all</button>
-    </div>
-
-    <!-- Cards -->
-    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3" x-show="apps.length">
-      <template x-for="(app, index) in filteredApps" :key="index">
-        <div class="bg-white border rounded-xl shadow-sm overflow-hidden flex flex-col">
-          <template x-if="app.logo">
-            <img :src="app.logo" alt="" class="h-44 object-cover w-full" loading="lazy" width="640" height="176">
-          </template>
-
-          <div class="p-4 flex-1 flex flex-col">
-            <!-- Title + Save -->
-            <div class="flex items-start gap-2">
-              <h2 class="text-lg font-semibold flex-1 leading-snug" x-text="app.title"></h2>
-              <button class="text-sm border rounded px-2 py-1 no-print"
-                      :aria-pressed="isSaved(app) ? 'true' : 'false'"
-                      @click="toggleSave(app)">
-                <span x-show="!isSaved(app)">☆ Save</span>
-                <span x-show="isSaved(app)">★ Saved</span>
-              </button>
-            </div>
-
-            <!-- Department badges -->
-            <div class="flex flex-wrap gap-2 mt-2 mb-3">
-              <template x-for="d in parseDepts(app.department)" :key="d">
-                <span class="text-xs px-2 py-0.5 rounded-full border text-gray-700" x-text="d"></span>
-              </template>
-            </div>
-
-            <!-- At-a-glance badges -->
-            <div class="flex flex-wrap gap-2 mb-3">
-              <template x-if="facet(app, 'free')">
-                <span class="text-[11px] px-2 py-0.5 rounded-full border">Free</span>
-              </template>
-              <template x-if="typeof app.time_min==='number' && app.time_min>0">
-                <span class="text-[11px] px-2 py-0.5 rounded-full border" x-text="'Time: ' + app.time_min + ' min'"></span>
-              </template>
-              <template x-if="(app.input || facet(app,'hands') || facet(app,'controllers'))">
-                <span class="text-[11px] px-2 py-0.5 rounded-full border" x-text="'Input: ' + (app.input || (facet(app,'hands')?'Hands':(facet(app,'controllers')?'Controllers':'–')))"></span>
-              </template>
-              <template x-if="(app.comfort || facet(app,'seated') || facet(app,'room') || facet(app,'standing'))">
-                <span class="text-[11px] px-2 py-0.5 rounded-full border" x-text="'Comfort: ' + (app.comfort || (facet(app,'seated')?'Seated':(facet(app,'room')?'Room-scale':(facet(app,'standing')?'Standing':'Unknown'))))"></span>
-              </template>
-            </div>
-
-            <!-- Summary -->
-            <template x-if="app.description">
-              <p class="text-sm text-gray-800 mb-2" x-text="app.description"></p>
-            </template>
-            <template x-if="app.educational">
-              <p class="text-sm text-blue-900 italic mb-2">
-                📘 <span x-text="app.educational"></span>
-              </p>
-            </template>
-
-            <div class="mt-auto flex items-center justify-between">
-              <div class="text-xs text-gray-600 truncate" x-text="Array.isArray(app.tags) ? app.tags.join(', ') : (app.tags || '')"></div>
-              <div class="flex items-center gap-3">
-                <template x-if="app.link">
-                  <a :href="app.link" target="_blank" class="text-blue-600 hover:underline text-sm" aria-label="View on store">View</a>
-                </template>
-                <!-- Details button -->
-                <button
-                  class="text-sm underline no-print"
-                  @click="toggleDetails(index)"
-                  :aria-expanded="!!detailsOpen[index]"
-                  :aria-controls="'details-'+index"
-                  x-text="detailsOpen[index] ? 'Hide details' : 'Details'">
-                </button>
+      <div x-show="activeTab==='apps'" id="tab-apps">
+        <p class="text-xs text-gray-400 italic" x-show="!appsReady">Loading app catalog...</p>
+        <template x-if="appsReady">
+          <div class="lg:grid lg:grid-cols-12 gap-6">
+            <aside class="lg:col-span-4 xl:col-span-3">
+              <div class="bg-white border rounded-xl shadow-sm p-4 space-y-6">
+                <div>
+                  <label class="block text-xs text-gray-600 mb-1">Search</label>
+                  <input type="text" x-model="query" placeholder="Title, notes, tags, skills."
+                         class="w-full border px-3 py-2 rounded-md shadow-sm">
+                </div>
+                <div class="grid grid-cols-2 gap-2 text-sm">
+                  <label class="flex items-center gap-2"><input type="checkbox" x-model="approvedOnly"> <span>Approved</span></label>
+                  <label class="flex items-center gap-2"><input type="checkbox" x-model="installedOnly"> <span>Installed</span></label>
+                </div>
+                <div>
+                  <h3 class="text-sm font-semibold text-gray-700 mb-2">Quick toggles</h3>
+                  <div class="space-y-2 text-sm">
+                    <label class="flex items-center gap-2"><input type="checkbox" :checked="quickPills.has('free')" @change="togglePill('free')"> <span>Free</span></label>
+                    <label class="flex items-center gap-2"><input type="checkbox" :checked="quickPills.has('short')" @change="togglePill('short')"> <span>&le; 15 min</span></label>
+                    <label class="flex items-center gap-2"><input type="checkbox" :checked="quickPills.has('hands')" @change="togglePill('hands')"> <span>Hands</span></label>
+                    <label class="flex items-center gap-2"><input type="checkbox" :checked="quickPills.has('lowmotion')" @change="togglePill('lowmotion')"> <span>Low motion</span></label>
+                    <label class="flex items-center gap-2"><input type="checkbox" :checked="quickPills.has('quest3')" @change="togglePill('quest3')"> <span>Quest 3</span></label>
+                  </div>
+                </div>
+                <div>
+                  <h3 class="text-sm font-semibold text-gray-700 mb-2">Departments</h3>
+                  <div class="max-h-52 overflow-y-auto pr-1 space-y-1 text-sm">
+                    <template x-for="opt in facetOptions.departments" :key="'dept-'+opt.value">
+                      <label class="flex items-center gap-2">
+                        <input type="checkbox" :checked="isFacetSelected('departments', opt.value)" @change="toggleFacet('departments', opt.value)">
+                        <span x-text="opt.label + ' (' + opt.count + ')'"></span>
+                      </label>
+                    </template>
+                    <p class="text-xs text-gray-400" x-show="!facetOptions.departments.length">No departments available.</p>
+                  </div>
+                </div>
+                <div>
+                  <h3 class="text-sm font-semibold text-gray-700 mb-2">Durable Skills</h3>
+                  <div class="max-h-56 overflow-y-auto pr-1 space-y-1 text-sm">
+                    <template x-for="opt in facetOptions.durableSkills" :key="'skill-'+opt.value">
+                      <label class="flex items-start gap-2">
+                        <input type="checkbox" class="mt-1" :checked="isFacetSelected('durableSkills', opt.value)" @change="toggleFacet('durableSkills', opt.value)">
+                        <span class="leading-snug">
+                          <span class="help-dotted cursor-help" :title="skillDefinition(opt.label)" x-text="opt.label"></span>
+                          <span class="text-gray-500" x-text="' (' + opt.count + ')'"></span>
+                        </span>
+                      </label>
+                    </template>
+                    <p class="text-xs text-gray-400" x-show="!facetOptions.durableSkills.length">No durable skills available.</p>
+                  </div>
+                </div>
+                <div>
+                  <h3 class="text-sm font-semibold text-gray-700 mb-2">Comfort Level</h3>
+                  <div class="space-y-1 text-sm">
+                    <template x-for="opt in facetOptions.comfort" :key="'comfort-'+opt.value">
+                      <label class="flex items-center gap-2">
+                        <input type="checkbox" :checked="isFacetSelected('comfort', opt.value)" @change="toggleFacet('comfort', opt.value)">
+                        <span x-text="opt.label + ' (' + opt.count + ')'"></span>
+                      </label>
+                    </template>
+                    <p class="text-xs text-gray-400" x-show="!facetOptions.comfort.length">No comfort data.</p>
+                  </div>
+                </div>
+                <div>
+                  <h3 class="text-sm font-semibold text-gray-700 mb-2">Input Type</h3>
+                  <div class="space-y-1 text-sm">
+                    <template x-for="opt in facetOptions.input" :key="'input-'+opt.value">
+                      <label class="flex items-center gap-2">
+                        <input type="checkbox" :checked="isFacetSelected('input', opt.value)" @change="toggleFacet('input', opt.value)">
+                        <span x-text="opt.label + ' (' + opt.count + ')'"></span>
+                      </label>
+                    </template>
+                    <p class="text-xs text-gray-400" x-show="!facetOptions.input.length">No input information.</p>
+                  </div>
+                </div>
+                <div>
+                  <h3 class="text-sm font-semibold text-gray-700 mb-2">Devices</h3>
+                  <div class="max-h-40 overflow-y-auto pr-1 space-y-1 text-sm">
+                    <template x-for="opt in facetOptions.devices" :key="'device-'+opt.value">
+                      <label class="flex items-center gap-2">
+                        <input type="checkbox" :checked="isFacetSelected('devices', opt.value)" @change="toggleFacet('devices', opt.value)">
+                        <span x-text="opt.label + ' (' + opt.count + ')'"></span>
+                      </label>
+                    </template>
+                    <p class="text-xs text-gray-400" x-show="!facetOptions.devices.length">No device information.</p>
+                  </div>
+                </div>
+                <div>
+                  <h3 class="text-sm font-semibold text-gray-700 mb-2">Age Range</h3>
+                  <div class="space-y-1 text-sm">
+                    <template x-for="opt in facetOptions.age" :key="'age-'+opt.value">
+                      <label class="flex items-center gap-2">
+                        <input type="checkbox" :checked="isFacetSelected('age', opt.value)" @change="toggleFacet('age', opt.value)">
+                        <span x-text="opt.label + ' (' + opt.count + ')'"></span>
+                      </label>
+                    </template>
+                    <p class="text-xs text-gray-400" x-show="!facetOptions.age.length">No age information.</p>
+                  </div>
+                </div>
               </div>
-            </div>
+            </aside>
 
-            <!-- Collapsible detail -->
-            <div
-              x-show="detailsOpen[index]"
-              x-transition
-              class="mt-3 border-t pt-3 text-sm text-gray-700"
-              :id="'details-'+index"
-            >
-              <dl class="grid grid-cols-2 gap-x-4 gap-y-1">
-                <dt class="text-gray-500">Cost</dt>
-                <dd x-text="app.cost || 'Unknown'"></dd>
+            <div class="lg:col-span-8 xl:col-span-9">
+              <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                <span class="text-sm text-gray-500" x-text="filteredApps.length + ' results'"></span>
+                <div class="flex items-center gap-2">
+                  <label class="text-xs text-gray-600">Sort</label>
+                  <select x-model="sortMode" class="border px-3 py-2 rounded-md shadow-sm text-sm">
+                    <option value="az">Title A-Z</option>
+                    <option value="za">Title Z-A</option>
+                  </select>
+                </div>
+              </div>
 
-                <dt class="text-gray-500">Time</dt>
-                <dd x-text="(typeof app.time_min==='number' && app.time_min>0) ? (app.time_min + ' min') : 'Unknown'"></dd>
+              <div class="grid gap-6 sm:grid-cols-2 xl:grid-cols-2">
+                <template x-for="(app, index) in filteredApps" :key="index">
+                  <div class="group rounded-2xl bg-gradient-to-br from-slate-100 via-white to-white p-[1px] shadow-sm transition hover:shadow-lg">
+                    <article class="h-full rounded-[1.15rem] bg-white flex flex-col overflow-hidden">
+                      <div class="relative h-44 bg-slate-900/5">
+                        <template x-if="app.logo">
+                          <img :src="app.logo" alt="" class="absolute inset-0 h-full w-full object-cover" loading="lazy" width="640" height="176">
+                        </template>
+                        <template x-if="!app.logo">
+                          <div class="flex h-full w-full items-center justify-center text-3xl font-semibold text-slate-400" x-text="(app.title || '?').split(/\\s+/).map(word => word?.charAt(0) || '').join('').slice(0,2).toUpperCase() || '?'"></div>
+                        </template>
+                      </div>
 
-                <dt class="text-gray-500">Comfort</dt>
-                <dd x-text="app.comfort || 'Unknown'"></dd>
+                      <div class="flex-1 p-5 flex flex-col gap-4">
+                        <div>
+                          <p class="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500" x-text="primaryDepartment(app)"></p>
+                          <h2 class="text-lg font-semibold leading-snug text-slate-900" x-text="app.title"></h2>
+                          <p class="mt-1 text-sm font-medium text-slate-700" x-text="classroomUse(app)"></p>
+                          <p class="mt-1 text-xs text-slate-500" x-text="classroomSummary(app)"></p>
+                        </div>
 
-                <dt class="text-gray-500">Motion</dt>
-                <dd x-text="app.motion_level || 'Unknown'"></dd>
+                        <div class="flex flex-wrap gap-1.5">
+                          <template x-for="badge in cardBadges(app)" :key="badge.label">
+                            <span class="text-[11px] font-medium px-2.5 py-1 rounded-full border"
+                                  :class="badge.tone === 'green' ? 'border-green-200 bg-green-50 text-green-900' : (badge.tone === 'blue' ? 'border-blue-200 bg-blue-50 text-blue-900' : 'border-slate-200 bg-slate-50 text-slate-700')"
+                                  x-text="badge.label"></span>
+                          </template>
+                        </div>
 
-                <dt class="text-gray-500">Input</dt>
-                <dd x-text="app.input || 'Unknown'"></dd>
+                        <template x-if="app.educational"><p class="text-sm text-slate-800" x-text="app.educational"></p></template>
+                        <template x-if="!app.educational && app.description"><p class="text-sm text-slate-800" x-text="app.description"></p></template>
+                        <template x-if="Array.isArray(app.durable_skills) && app.durable_skills.length">
+                          <div class="flex flex-wrap gap-1.5">
+                            <template x-for="skill in app.durable_skills.slice(0, 3)" :key="skill">
+                              <span class="skill-chip text-[11px] font-medium px-2.5 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-900 cursor-help"
+                                    :title="skillDefinition(skill)"
+                                    x-text="skill"></span>
+                            </template>
+                          </div>
+                        </template>
 
-                <dt class="text-gray-500">Devices</dt>
-                <dd x-text="Array.isArray(app.devices) && app.devices.length ? app.devices.join(' • ') : 'Unknown'"></dd>
+                        <div class="mt-auto flex flex-wrap items-center gap-3">
+                          <div class="flex items-center gap-2 shrink-0">
+                            <template x-if="app.link">
+                              <a :href="storeLink(app)" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" title="Opens the app's Meta store page or listing.">View store page</a>
+                            </template>
+                            <button class="btn btn-ghost text-sm font-semibold" @click="toggleDetails(index)" :aria-expanded="!!detailsOpen[index]" :aria-controls="'details-'+index" x-text="detailsOpen[index] ? 'Hide details' : 'Details'"></button>
+                          </div>
+                        </div>
 
-                <template x-if="app.age">
-                  <template>
-                    <dt class="text-gray-500">Age</dt>
-                    <dd x-text="app.age"></dd>
-                  </template>
+                        <div x-show="detailsOpen[index]" x-transition class="card-details text-sm text-slate-800" :id="'details-'+index">
+                          <dl class="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
+                            <dt class="text-slate-500">Cost</dt><dd x-text="app.cost || 'Unknown'"></dd>
+                            <dt class="text-slate-500">Time</dt><dd x-text="(typeof app.time_min==='number' && app.time_min>0) ? (app.time_min + ' min') : 'Unknown'"></dd>
+                            <dt class="text-slate-500">Comfort</dt><dd x-text="app.comfort || 'Unknown'"></dd>
+                            <dt class="text-slate-500">Motion</dt><dd x-text="app.motion_level || 'Unknown'"></dd>
+                            <dt class="text-slate-500">Input</dt><dd x-text="app.input || 'Unknown'"></dd>
+                            <dt class="text-slate-500">Devices</dt><dd x-text="Array.isArray(app.devices) && app.devices.length ? app.devices.join(', ') : 'Unknown'"></dd>
+                            <template x-if="app.age"><template><dt class="text-slate-500">Age</dt><dd x-text="app.age"></dd></template></template>
+                          </dl>
+
+                          <template x-if="Array.isArray(app.durable_skills) && app.durable_skills.length">
+                            <div class="mt-3">
+                              <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Durable skills</p>
+                              <div class="mt-2 flex flex-wrap gap-1.5">
+                                <template x-for="skill in app.durable_skills" :key="'detail-'+skill">
+                                  <span class="skill-chip text-xs font-medium px-2.5 py-1 rounded-full bg-white border border-amber-200 text-amber-900 cursor-help"
+                                        :title="skillDefinition(skill)"
+                                        x-text="skill"></span>
+                                </template>
+                              </div>
+                            </div>
+                          </template>
+
+                          <template x-if="app.content_notes"><p class="mt-3 text-xs text-slate-600" x-text="'Notes: ' + app.content_notes"></p></template>
+
+                          <p class="mt-2 text-xs text-slate-600 flex flex-wrap gap-4">
+                            <span x-text="'Approved: ' + (app.approved ? 'Yes' : 'No')"></span>
+                            <span x-text="'Installed: ' + (app.installed ? 'Yes' : 'No')"></span>
+                          </p>
+
+                          <div class="mt-3 flex flex-wrap gap-3">
+                            <template x-if="app.link"><a :href="storeLink(app)" target="_blank" rel="noopener noreferrer" class="text-sm font-semibold text-blue-600 hover:text-blue-700">View store page</a></template>
+                            <button class="text-sm font-semibold text-slate-600 hover:text-slate-800" @click="navigator.clipboard?.writeText(storeLink(app) || window.location.href)">Copy link</button>
+                          </div>
+                        </div>
+                      </div>
+                    </article>
+                  </div>
                 </template>
-              </dl>
-
-              <template x-if="app.content_notes">
-                <p class="mt-3 text-xs text-gray-600" x-text="'Notes: ' + app.content_notes"></p>
-              </template>
-
-              <template x-if="app.approved !== undefined">
-                <p class="mt-2 text-xs text-gray-600">
-                  <span x-text="app.approved ? '✅ Approved for Lab' : '⏳ Not approved yet'"></span> •
-                  <span x-text="app.installed ? 'Installed' : 'Not installed'"></span>
-                </p>
-              </template>
-
-              <div class="mt-3 flex gap-3">
-                <template x-if="app.link">
-                  <a :href="app.link" target="_blank" class="text-blue-600 hover:underline text-sm">Open store page</a>
-                </template>
-                <button
-                  class="text-sm underline"
-                  @click="navigator.clipboard?.writeText(app.link || window.location.href)">
-                  Copy link
-                </button>
               </div>
             </div>
           </div>
-        </div>
-      </template>
-    </div>
+        </template>
+        <p class="mt-6 text-xs text-gray-500" x-show="appsReady && filteredApps.length === 0">No results found.</p>
+      </div>
 
-    <p class="mt-6 text-xs text-gray-500" x-show="apps.length && !filteredApps.length">No results found.</p>
-    <p class="mt-6 text-xs text-gray-400 italic" x-show="!apps.length">Loading app data…</p>
+      <div x-show="activeTab==='videos'" id="tab-videos">
+        <p class="text-xs text-gray-400 italic" x-show="!videosReady">Loading video catalog...</p>
+        <template x-if="videosReady">
+          <div class="lg:grid lg:grid-cols-12 gap-6">
+            <aside class="lg:col-span-4 xl:col-span-3">
+              <div class="bg-white border rounded-xl shadow-sm p-4 space-y-5">
+                <div class="flex items-center justify-between">
+                  <h2 class="text-sm font-semibold text-gray-700">Filters</h2>
+                  <button class="text-xs text-blue-600 hover:underline" @click="clearVideoFilters()">Reset</button>
+                </div>
+                <div>
+                  <label class="block text-xs text-gray-600 mb-1">Search</label>
+                  <input type="text" x-model="videoQuery" placeholder="Title, notes, tags." class="w-full border px-3 py-2 rounded-md shadow-sm">
+                </div>
+                <div>
+                  <label class="block text-xs text-gray-600 mb-1">Department</label>
+                  <select x-model="videoDepartment" class="w-full border px-3 py-2 rounded-md shadow-sm text-sm">
+                    <option value="">All Departments</option>
+                    <template x-for="opt in videoDepartmentOptions" :key="'video-'+opt.value">
+                      <option :value="opt.value" x-text="opt.label + ' (' + opt.count + ')'"></option>
+                    </template>
+                  </select>
+                </div>
+              </div>
+            </aside>
+            <div class="lg:col-span-8 xl:col-span-9">
+              <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                <span class="text-sm text-gray-500" x-text="filteredVideos.length + ' results'"></span>
+                <div class="flex items-center gap-2">
+                  <label class="text-xs text-gray-600">Sort</label>
+                  <select x-model="videoSortMode" class="border px-3 py-2 rounded-md shadow-sm text-sm">
+                    <option value="az">Title A-Z</option>
+                    <option value="za">Title Z-A</option>
+                  </select>
+                </div>
+              </div>
+              <div class="grid gap-6 sm:grid-cols-2 xl:grid-cols-2">
+                <template x-for="(video, vIndex) in filteredVideos" :key="'video-'+vIndex">
+                  <div class="group rounded-2xl bg-gradient-to-br from-indigo-50 via-white to-white p-[1px] shadow-sm transition hover:shadow-lg">
+                    <article class="h-full rounded-[1.15rem] bg-white flex flex-col overflow-hidden">
+                      <div class="relative h-44 bg-indigo-900/5">
+                        <template x-if="video.logo">
+                          <img :src="video.logo" alt="" class="absolute inset-0 h-full w-full object-cover" loading="lazy" width="640" height="176">
+                        </template>
+                        <template x-if="!video.logo">
+                          <div class="flex h-full w-full items-center justify-center text-2xl font-semibold text-indigo-200 bg-gradient-to-br from-indigo-500/50 to-slate-900/50 text-opacity-90" x-text="(video.title || '?').split(/\\s+/).map(word => word?.charAt(0) || '').join('').slice(0,2).toUpperCase() || '?'"></div>
+                        </template>
+                        <template x-if="video.platform">
+                          <span class="absolute top-3 left-3 inline-flex items-center rounded-full border border-indigo-200 bg-white/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-indigo-900" x-text="video.platform"></span>
+                        </template>
+                      </div>
+
+                      <div class="p-5 flex-1 flex flex-col gap-3">
+                        <div>
+                          <h2 class="text-lg font-semibold leading-snug text-slate-900" x-text="video.title"></h2>
+                          <div class="flex flex-wrap gap-1.5 mt-2">
+                            <template x-for="dept in parseDepts(video.department)" :key="dept">
+                              <span class="text-[11px] font-medium px-2.5 py-1 rounded-full bg-slate-50 border border-slate-200 text-slate-700" x-text="dept"></span>
+                            </template>
+                          </div>
+                        </div>
+
+                        <template x-if="video.description"><p class="text-sm text-slate-800" x-text="video.description"></p></template>
+                        <template x-if="video.educational"><p class="text-sm text-indigo-900 italic" x-text="video.educational"></p></template>
+                        <template x-if="video.tags"><p class="text-xs text-slate-600" x-text="video.tags"></p></template>
+                        <template x-if="video.notes"><p class="text-xs text-slate-500" x-text="video.notes"></p></template>
+
+                        <div class="mt-auto flex flex-wrap items-center gap-3">
+                          <div class="text-xs text-slate-500 truncate flex-1 min-w-[140px]" x-text="video.link ? video.link : 'No external link provided'"></div>
+                          <template x-if="video.link">
+                            <a :href="video.link" target="_blank" class="btn btn-primary">Watch now</a>
+                          </template>
+                        </div>
+                      </div>
+                    </article>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </div>
+        </template>
+        <p class="mt-6 text-xs text-gray-500" x-show="videosReady && filteredVideos.length === 0">No videos match the current filters.</p>
+      </div>
+
+      <div x-show="activeTab==='webxr'" id="tab-webxr">
+        <p class="text-xs text-gray-400 italic" x-show="!webxrReady">Loading WebXR catalog...</p>
+        <template x-if="webxrReady">
+          <div class="lg:grid lg:grid-cols-12 gap-6">
+            <aside class="lg:col-span-4 xl:col-span-3">
+              <div class="bg-white border rounded-xl shadow-sm p-4 space-y-5">
+                <div class="flex items-center justify-between">
+                  <h2 class="text-sm font-semibold text-gray-700">Filters</h2>
+                  <button class="text-xs text-blue-600 hover:underline" @click="clearWebxrFilters()">Reset</button>
+                </div>
+                <div>
+                  <label class="block text-xs text-gray-600 mb-1">Search</label>
+                  <input type="text" x-model="webxrQuery" placeholder="Title, notes, tags." class="w-full border px-3 py-2 rounded-md shadow-sm">
+                </div>
+                <div>
+                  <label class="block text-xs text-gray-600 mb-1">Department</label>
+                  <select x-model="webxrDepartment" class="w-full border px-3 py-2 rounded-md shadow-sm text-sm">
+                    <option value="">All Departments</option>
+                    <template x-for="opt in webxrDepartmentOptions" :key="'webxr-'+opt.value">
+                      <option :value="opt.value" x-text="opt.label + ' (' + opt.count + ')'"></option>
+                    </template>
+                  </select>
+                </div>
+              </div>
+            </aside>
+            <div class="lg:col-span-8 xl:col-span-9">
+              <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                <span class="text-sm text-gray-500" x-text="filteredWebxr.length + ' results'"></span>
+                <div class="flex items-center gap-2">
+                  <label class="text-xs text-gray-600">Sort</label>
+                  <select x-model="webxrSortMode" class="border px-3 py-2 rounded-md shadow-sm text-sm">
+                    <option value="az">Title A-Z</option>
+                    <option value="za">Title Z-A</option>
+                  </select>
+                </div>
+              </div>
+              <div class="grid gap-6 sm:grid-cols-2 xl:grid-cols-2">
+                <template x-for="(item, wIndex) in filteredWebxr" :key="'webxr-'+wIndex">
+                  <div class="group rounded-2xl bg-gradient-to-br from-indigo-50 via-white to-white p-[1px] shadow-sm transition hover:shadow-lg">
+                    <article class="h-full rounded-[1.15rem] bg-white flex flex-col overflow-hidden">
+                      <div class="relative h-44 bg-indigo-900/5">
+                        <template x-if="item.logo">
+                          <img :src="item.logo" alt="" class="absolute inset-0 h-full w-full object-cover" loading="lazy" width="640" height="176">
+                        </template>
+                        <template x-if="!item.logo">
+                          <div class="flex h-full w-full items-center justify-center text-2xl font-semibold text-indigo-200 bg-gradient-to-br from-indigo-500/50 to-slate-900/50 text-opacity-90" x-text="(item.title || '?').split(/\\s+/).map(word => word?.charAt(0) || '').join('').slice(0,2).toUpperCase() || '?'"></div>
+                        </template>
+                        <template x-if="item.platform">
+                          <span class="absolute top-3 left-3 inline-flex items-center rounded-full border border-indigo-200 bg-white/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-indigo-900" x-text="item.platform"></span>
+                        </template>
+                      </div>
+
+                      <div class="p-5 flex-1 flex flex-col gap-3">
+                        <div>
+                          <h2 class="text-lg font-semibold leading-snug text-slate-900" x-text="item.title"></h2>
+                          <div class="flex flex-wrap gap-1.5 mt-2">
+                            <template x-for="dept in parseDepts(item.department)" :key="dept">
+                              <span class="text-[11px] font-medium px-2.5 py-1 rounded-full bg-slate-50 border border-slate-200 text-slate-700" x-text="dept"></span>
+                            </template>
+                          </div>
+                        </div>
+
+                        <template x-if="item.description"><p class="text-sm text-slate-800" x-text="item.description"></p></template>
+                        <template x-if="item.educational"><p class="text-sm text-indigo-900 italic" x-text="item.educational"></p></template>
+                        <template x-if="item.tags"><p class="text-xs text-slate-600" x-text="item.tags"></p></template>
+                        <template x-if="item.notes"><p class="text-xs text-slate-500" x-text="item.notes"></p></template>
+
+                        <div class="mt-auto flex flex-wrap items-center gap-3">
+                          <div class="text-xs text-slate-500 truncate flex-1 min-w-[140px]" x-text="item.link ? item.link : 'No external link provided'"></div>
+                          <template x-if="item.link">
+                            <a :href="item.link" target="_blank" class="btn btn-primary">Open</a>
+                          </template>
+                        </div>
+                      </div>
+                    </article>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </div>
+        </template>
+        <p class="mt-6 text-xs text-gray-500" x-show="webxrReady && filteredWebxr.length === 0">No WebXR content matches the current filters.</p>
+      </div>
+    </div>
   </div>
 
-<script>
-  function app() {
-    return {
-      // --- base state ---
-      DATA_BY_TAB: {},
-      sheetNames: [],
-      currentTab: '',
-      query: '',
-      department: '',
-      departmentOptions: [],     // array of names
-      deptCounts: {},            // name -> count
-      sortMode: 'az',            // only 'az' or 'za'
-
-      // Saved + UI
-      quickPills: new Set(),
-      savedIds: JSON.parse(localStorage.getItem('xr_saved') || '[]'),
-      savedOnly: false,
-      detailsOpen: {},
-      printMode: false,
-
-      // ---------- helpers ----------
-      get apps() { return this.DATA_BY_TAB[this.currentTab] || []; },
-
-      toText(v) {
-        if (Array.isArray(v)) return v.map(x => this.toText(x)).join(' ');
-        if (v === null || v === undefined) return '';
-        return String(v);
-      },
-
-      // Accept department as array OR string
-      parseDepts(val){
-        if (Array.isArray(val)) return val.map(x => String(x).trim()).filter(Boolean);
-        if (typeof val === 'string') return val.split(/[,\|\/;]+/).map(s => s.trim()).filter(Boolean);
-        return [];
-      },
-
-      // Build dropdown options + counts
-      buildDepartmentOptions() {
-        const counts = {};
-        for (const a of this.apps) {
-          for (const d of this.parseDepts(a.department)) {
-            counts[d] = (counts[d] || 0) + 1;
-          }
-        }
-        this.deptCounts = counts;
-        const names = Object.keys(counts);
-        const collator = new Intl.Collator(undefined, { sensitivity: 'base' });
-        names.sort((a,b) => counts[b]-counts[a] || collator.compare(a,b));
-        this.departmentOptions = names;
-      },
-      deptOptionLabel(name){ return `${name} (${this.deptCounts[name] || 0})`; },
-
-      textBlob(app){
-        return [
-          app.title, app.description, app.educational, app.notes,
-          app.tags, app.department
-        ].map(this.toText.bind(this)).join(' ').toLowerCase();
-      },
-
-      // Quick filters (prefer structured fields; fallback to text)
-      facet(app, key){
-        const t = this.textBlob(app);
-        const devices = Array.isArray(app.devices) ? app.devices.join(' ').toLowerCase() : '';
-        const cost = (app.cost || '').toLowerCase();
-        const comfort = (app.comfort || '').toLowerCase();
-        const motion = (app.motion_level || '').toLowerCase();
-        const input = (app.input || '').toLowerCase();
-
-        switch(key){
-          case 'free':        return cost === 'free' || /\bfree\b|no\s*cost/.test(t);
-          case 'short':       return (typeof app.time_min === 'number' && app.time_min <= 15) || /\b(10|12|15)\s*(min|minutes)\b|\bshort\b/.test(t);
-          case 'hands':       return input === 'hands' || input === 'both' || /\bhand(?:s)?\b|hand[-\s]?tracking/.test(t);
-          case 'controllers': return input === 'controllers' || input === 'both' || /\bcontroller(s)?\b|touch controller/.test(t);
-          case 'lowmotion':   return motion === 'low' || (/\bseated\b/.test(t) && !/\b(locomotion|free movement|stick movement)\b/.test(t));
-          case 'quest3':      return /quest\s*3/.test(devices) || /\bquest\s*3\b|meta\s*quest\s*3/.test(t);
-          default: return false;
-        }
-      },
-
-      pillClass(key){ return this.quickPills.has(key) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-800'; },
-      togglePill(key){ this.quickPills.has(key) ? this.quickPills.delete(key) : this.quickPills.add(key); },
-      clearAll(){
-        this.quickPills.clear();
-        this.query='';
-        this.department='';
-        this.sortMode='az';
-        this.savedOnly=false;
-      },
-
-      appId(app){ return (app.title || '') + '|' + (app.link || ''); },
-      isSaved(app){ return this.savedIds.includes(this.appId(app)); },
-      toggleSave(app){
-        const id = this.appId(app);
-        this.savedIds = this.isSaved(app) ? this.savedIds.filter(x=>x!==id) : [...this.savedIds,id];
-        localStorage.setItem('xr_saved', JSON.stringify(this.savedIds));
-      },
-
-      // Details toggle
-      toggleDetails(i){ this.detailsOpen[i] = !this.detailsOpen[i]; },
-
-      // ---------- filtering + sorting ----------
-      get filteredApps() {
-        const q = this.query.toLowerCase();
-
-        const matchesPills = (app) => {
-          for (const p of this.quickPills) if (!this.facet(app, p)) return false;
-          return true;
-        };
-        const matchesSaved = (app) => !this.savedOnly || this.isSaved(app);
-
-        let out = this.apps.filter(app => {
-          const appDepts = this.parseDepts(app.department);
-          const matchesDept = !this.department || appDepts.includes(this.department);
-          const matchesQuery = !q || this.textBlob(app).includes(q);
-          return matchesDept && matchesQuery && matchesPills(app) && matchesSaved(app);
-        });
-
-        const collator = new Intl.Collator(undefined, { sensitivity: 'base', numeric: false });
-        if (this.sortMode === 'za') {
-          out = [...out].sort((a, b) => collator.compare((b.title || ''), (a.title || '')));
-        } else {
-          out = [...out].sort((a, b) => collator.compare((a.title || ''), (b.title || '')));
-        }
-        return out;
-      },
-
-      // ---------- UI plumbing ----------
-      switchTab(tab) {
-        this.currentTab = tab;
-        this.query = '';
-        this.department = '';
-        this.sortMode = 'az';
-        this.quickPills.clear();
-        this.savedOnly = false;
-        this.buildDepartmentOptions();
-      },
-
-      a11yInit(){
-        document.querySelectorAll('button, a, input, select').forEach(el=>{
-          el.classList.add('focus:outline-none','focus:ring','focus:ring-blue-300');
-        });
-      },
-
-      togglePrintMode(){
-        this.printMode = !this.printMode;
-        const params = new URLSearchParams(window.location.search);
-        if (this.printMode) params.set('print','1'); else params.delete('print');
-        history.replaceState(null, '', `${location.pathname}?${params.toString()}${location.hash}`);
-      },
-
-      // ---------- data load ----------
-      async loadData() {
-        try {
-          const [appsRes, videosRes, webxrRes] = await Promise.all([
-            fetch('app_library.json'),
-            fetch('video_content.json'),
-            fetch('webxr_content.json')
-          ]);
-          const [apps, videos, webxr] = await Promise.all([
-            appsRes.json(),
-            videosRes.json(),
-            webxrRes.json()
-          ]);
-
-          const withIndex = arr => arr.map((item, i) => ({ ...item, _idx: i }));
-
-          this.DATA_BY_TAB = {
-            "App Library": withIndex(apps),
-            "Video Content": withIndex(videos),
-            "WebXR Content": withIndex(webxr)
-          };
-
-          this.sheetNames = Object.keys(this.DATA_BY_TAB);
-          this.currentTab = this.sheetNames[0];
-          this.buildDepartmentOptions();
-          this.a11yInit();
-
-          if (new URLSearchParams(location.search).get('print') === '1') {
-            this.printMode = true;
-          }
-        } catch (err) {
-          console.error("Failed to load JSON data:", err);
-        }
-      }
-    }
-  }
-</script>
 </body>
 </html>
